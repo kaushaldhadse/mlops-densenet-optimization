@@ -198,8 +198,7 @@ print_tensorboard_info() {
     print_section "TensorBoard Access Information"
     
     echo "🌐 TensorBoard Web Interfaces:"
-    echo "  📊 Main Dashboard: http://localhost:6006"
-    echo "  🔍 Profiler Dashboard: http://localhost:6007"
+    echo "  📊 Dashboard: http://localhost:6006"
     echo ""
     echo "📂 Log Directory: /densenet_optimization/logs/tensorboard/"
     echo ""

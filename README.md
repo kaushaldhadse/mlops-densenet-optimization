@@ -74,7 +74,6 @@ data/
 
 - Results → `./results/benchmark_results.csv`
 - TensorBoard → [http://localhost:6006](http://localhost:6006)
-- Profiler → [http://localhost:6007](http://localhost:6007)
 
 ### 2. Custom Ports
 

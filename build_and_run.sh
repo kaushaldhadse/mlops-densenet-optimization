@@ -265,8 +265,7 @@ EOF
     
     # TensorBoard info
     echo -e "\n${GREEN}📊 TensorBoard Visualization:${NC}"
-    echo -e "   🌐 Main Dashboard: http://localhost:$TENSORBOARD_PORT"
-    echo -e "   🔍 Profiler Dashboard: http://localhost:$PROFILER_PORT"
+    echo -e "   🌐 Dashboard: http://localhost:$TENSORBOARD_PORT"
     echo -e "   📁 Logs Directory: ./logs/tensorboard/"
     
     # Additional outputs

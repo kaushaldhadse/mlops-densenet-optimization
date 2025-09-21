@@ -61,6 +61,7 @@ data/
 - NVIDIA Docker Runtime (for GPU support)
 - At least **8GB RAM**
 - **10GB free disk space**
+- WSL2 setup if running on Windows (and run the script within WSL)
 
 ---
 
@@ -74,7 +75,6 @@ data/
 
 - Results → `./results/benchmark_results.csv`
 - TensorBoard → [http://localhost:6006](http://localhost:6006)
-- Profiler → [http://localhost:6007](http://localhost:6007)
 
 ### 2. Custom Ports
 
@@ -187,6 +187,64 @@ model_size_mb,optimization_technique
 
 ---
 
+## Possible Issues and Solutions
+
+### 1. Docker Credential Error
+
+**Error:** error getting credentials - err: exit status 1
+
+**Cause:**  
+Docker Desktop was using `credsStore: "desktop.exe"` in `~/.docker/config.json`.
+
+**Solution:**  
+Edit `~/.docker/config.json` and remove or update the `credsStore` entry:
+
+```json
+{
+  "auths": {
+    "https://index.docker.io/v1/": {}
+  }
+}
+```
+
+### 2. NVIDIA Docker GPU Support in WSL2
+
+**Error:**
+RuntimeError: CUDA driver not found,
+torch.cuda.is_available() -> False
+
+**Cause:**
+
+- NVIDIA GPU driver not properly installed for WSL2.
+- `nvidia-docker2` or `nvidia-container-toolkit` missing.
+- Docker Desktop not configured to expose GPU to WSL.
+
+**Solution:**
+
+- Enable GPU Support in Docker Desktop
+
+  Open Docker Desktop → Settings → Resources → WSL Integration.
+
+  Enable integration with your WSL2 distro.
+
+  Under Settings → GPU, check "Use the WSL2 based engine" and enable GPU support.
+
+- Install NVIDIA Container Toolkit inside WSL2
+
+  ```bash
+    sudo apt-get update
+    sudo apt-get install -y nvidia-container-toolkit
+    sudo systemctl restart docker
+
+  ```
+
+- Test GPU Access in Docker
+
+  ```bash
+    docker run --rm --gpus all nvidia/cuda:13.0.1-cudnn-runtime-ubuntu22.04 nvidia-smi
+
+  ```
+
 ## Trade-offs Discussion
 
 - **AMP**: Faster and memory-efficient but requires hardware support.
@@ -212,3 +270,7 @@ model_size_mb,optimization_technique
 - Advanced quantization (**PTQ, QAT**).
 - Automated hyperparameter tuning for optimal batch sizes.
 - Cloud-native deployment (**Kubernetes integration**).
+
+```
+
+```

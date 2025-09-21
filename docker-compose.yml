@@ -1,0 +1,93 @@
+
+services:
+  # Main MLOps DenseNet Optimization Application
+  mlops-densenet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mlops-densenet-benchmark
+    shm_size: 4g
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONPATH=/densenet_optimization
+      - TENSORBOARD_LOG_DIR=/densenet_optimization/logs/tensorboard
+      - RESULTS_DIR=/densenet_optimization/results
+      - DATA_DIR=/densenet_optimization/data
+      - PYTHON_VERSION=3.12.7
+    volumes:
+      # Mount results directory for persistent storage
+      - ./results:/densenet_optimization/results
+      # Mount logs directory for TensorBoard data
+      - ./logs:/densenet_optimization/logs
+      # Mount data directory (optional - for ImageNet data)
+      - ./data:/densenet_optimization/data
+      # Mount source code for development (optional)
+      - ./app:/densenet_optimization/app:ro
+    networks:
+      - mlops-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    depends_on:
+      - tensorboard
+    restart: unless-stopped
+
+  # TensorBoard Service for Visualization
+  tensorboard:
+    image: tensorflow/tensorflow:latest
+    container_name: mlops-tensorboard
+    command: >
+      tensorboard 
+      --logdir=/densenet_optimization/logs/tensorboard 
+      --host=0.0.0.0 
+      --port=6006
+      --reload_interval=10
+    # --samples_per_plugin=1000
+    ports:
+      - "${TENSORBOARD_PORT:-6006}:6006"  # TensorBoard web interface
+    volumes:
+      - ./logs:/densenet_optimization/logs
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6006"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Additional TensorBoard for Profiler traces (separate port)
+  # tensorboard-profiler:
+  #   image: tensorflow/tensorflow:latest
+  #   container_name: mlops-tensorboard-profiler
+  #   command: >
+  #     tensorboard 
+  #     --logdir=/densenet_optimization/logs/tensorboard 
+  #     --host=0.0.0.0 
+  #     --port=6007
+  #     --reload_interval=10
+  #   ports:
+  #     - "${PROFILER_PORT:-6007}:6007"  # TensorBoard profiler interface
+  #   volumes:
+  #     - ./logs:/densenet_optimization/logs
+  #   networks:
+  #     - mlops-network
+  #   restart: unless-stopped
+
+networks:
+  mlops-network:
+    driver: bridge
+
+volumes:
+  # Named volumes for persistent data
+  mlops-results:
+    driver: local
+  mlops-logs:
+    driver: local
+  mlops-data:
+    driver: local

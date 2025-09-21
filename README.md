@@ -270,7 +270,3 @@ torch.cuda.is_available() -> False
 - Advanced quantization (**PTQ, QAT**).
 - Automated hyperparameter tuning for optimal batch sizes.
 - Cloud-native deployment (**Kubernetes integration**).
-
-```
-
-```

@@ -62,6 +62,7 @@ data/
 - At least **8GB RAM**
 - **10GB free disk space**
 - WSL2 setup if running on Windows (and run the script within WSL)
+- Please manually create "results" and "logs" folders within base folder to avoid any possible errors. 
 
 ---
 

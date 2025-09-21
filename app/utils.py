@@ -4,11 +4,12 @@ import torch
 import io
 
 try:
-    import pynvml
-    pynvml.nvmlInit()
-    _pynvml_available = True
+    from py3nvml import py3nvml
+    py3nvml.nvmlInit()
+    _nvml_available = True
 except Exception:
-    _pynvml_available = False
+    _nvml_available = False
+
 
 
 def get_ram_usage_mb() -> float:
@@ -24,24 +25,25 @@ def get_cpu_utilization() -> float:
 
 
 def get_vram_usage_mb() -> float:
-    """Returns VRAM (GPU memory) usage in MB if GPU is available, else 0."""
-    if not _pynvml_available:
+    """Returns GPU memory usage in MB for the first GPU."""
+    if not _nvml_available:
         return 0.0
     try:
-        handle = pynvml.nvmlDeviceGetHandleByIndex(0)
-        mem_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
+        handle = py3nvml.nvmlDeviceGetHandleByIndex(0)
+        mem_info = py3nvml.nvmlDeviceGetMemoryInfo(handle)
         return mem_info.used / (1024 ** 2)
     except Exception:
         return 0.0
 
 
+
 def get_gpu_utilization() -> float:
-    """Returns GPU utilization percentage if available, else 0."""
-    if not _pynvml_available:
+    """Returns GPU utilization percentage for the first GPU."""
+    if not _nvml_available:
         return 0.0
     try:
-        handle = pynvml.nvmlDeviceGetHandleByIndex(0)
-        util = pynvml.nvmlDeviceGetUtilizationRates(handle)
+        handle = py3nvml.nvmlDeviceGetHandleByIndex(0)
+        util = py3nvml.nvmlDeviceGetUtilizationRates(handle)
         return float(util.gpu)
     except Exception:
         return 0.0
